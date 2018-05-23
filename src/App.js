@@ -6,6 +6,8 @@ import './App.css';
 // Toast notification dependencies
 import { ToastContainer, toast } from 'react-toastify';
 
+const BASE_URL = 'http://joes-autos.herokuapp.com/api'
+
 class App extends Component {
   constructor( props ) {
     super( props );
@@ -29,22 +31,47 @@ class App extends Component {
   }
 
   getVehicles() {
-    // axios (GET)
-    // setState with response -> vehiclesToDisplay
+    axios({
+      method: 'GET',
+      url: BASE_URL + '/vehicles'
+    }).then(response => {
+      this.setState({ vehiclesToDisplay: response.data })
+    })
   }
 
   getPotentialBuyers() {
-    // axios (GET)
+    axios({
+      method: 'GET',
+      url: BASE_URL + '/buyers'
+    }).then(response => {
+      this.setState({ buyersToDisplay: response.data})
+    })
     // setState with response -> buyersToDisplay
   }
 
   sellCar( id ) {
+    axios({
+      method: 'DELETE',
+      url: BASE_URL + '/vehicles/' + id
+    }).then( results => {
+      toast.success('Successfully sold car!')
+      this.setState({ vehiclesToDisplay: results.data.vehicles })
+    }).catch( () => toast.error('Failed at selling car.'))
+ 
+
     // axios (DELETE)
     // setState with response -> vehiclesToDisplay
   }
 
   filterByMake() {
     let make = this.refs.selectedMake.value;
+
+    axios({
+      method: 'GET',
+      url: BASE_URL + '/vehicles?make=' + make
+    }).then(response => {
+      this.setState({ vehiclesToDisplay: response.data })
+    })
 
     // axios (GET)
     // setState with response -> vehiclesToDisplay
@@ -53,11 +80,25 @@ class App extends Component {
   filterByColor() {
     let color = this.refs.selectedColor.value;
 
+    axios({
+      method: 'GET',
+      url: BASE_URL + '/vehicles?color=' + color
+    }).then(response => {
+      this.setState({ vehiclesToDisplay: response.data })
+    })
     // axios (GET)
     // setState with response -> vehiclesToDisplay
   }
 
   updatePrice( priceChange, id ) {
+    axios({
+      method: 'PUT',
+      url: BASE_URL + '/vehicles/' + id + '/' + priceChange
+    }).then(results => {
+      toast.success('Successfully updated price!')
+      this.setState({ vehiclesToDisplay: results.data.vehicles })
+    }).catch( () => toast.error('Failed at updating price'))
+    
     // axios (PUT)
     // setState with response -> vehiclesToDisplay
   }
@@ -71,7 +112,12 @@ class App extends Component {
       price: this.refs.price.value
     };
 
-    // axios (POST)
+    axios({
+      method: 'POST',
+      urls: BASE_URL + '/vehicles'
+    }).then(response => {
+      this.setState({ vehiclesToDisplay: response.data.vehicles })
+    })
     // setState with response -> vehiclesToDisplay
   }
 
@@ -82,11 +128,25 @@ class App extends Component {
       address: this.refs.address.value
     };
 
+    axios({
+      method: 'POST',
+      url: BASE_URL + '/buyers',
+      data: newBuyer
+    }).then(response => {
+      this.setState({ buyersToDisplay: response.data.buyers })
+    })
     //axios (POST)
     // setState with response -> buyersToDisplay
   }
 
   deleteBuyer( id ) {
+    axios({
+      method: 'DELETE',
+      url: BASE_URL + '/buyers/' + id
+    }).then(response => {
+      toast.success('Successfully removed buyer.')
+      this.setState({ buyersToDisplay: response.data.buyers })
+    }).catch( () => toast.error('Failed to remove buyer.'))
     // axios (DELETE)
     //setState with response -> buyersToDisplay
   }
